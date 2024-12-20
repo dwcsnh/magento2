@@ -39,3 +39,6 @@ bin/restart
 
 open https://magento.test
 ```
+
+
+### The language package is installed via composer, for proof check src/composer.json:26
