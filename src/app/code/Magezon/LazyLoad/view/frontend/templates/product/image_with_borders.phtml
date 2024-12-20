@@ -1,0 +1,16 @@
+<?php /** @var $block \Magento\Catalog\Block\Product\Image */
+$dataHelper = $this->helper('Magezon\LazyLoad\Helper\Data');
+$customAttributes = !is_array($block->getCustomAttributes()) ? $block->getCustomAttributes() : null;
+?>
+<span class="product-image-container"
+      style="width:<?= /* @escapeNotVerified */ $block->getWidth() ?>px;">
+    <span class="product-image-wrapper"
+          style="padding-bottom: <?= /* @escapeNotVerified */ ($block->getRatio() * 100) ?>%;">
+        <img class="product-image-photo <?= $dataHelper->getLazyClasses() ?>"
+            <?= /* @escapeNotVerified */ $customAttributes ?>
+                src="<?= $dataHelper->getPlaceHolderUrl() ?>"
+            data-src="<?= /* @escapeNotVerified */ $block->getImageUrl() ?>"
+            width="<?= /* @escapeNotVerified */ $block->getResizedImageWidth() ?>"
+            height="<?= /* @escapeNotVerified */ $block->getResizedImageHeight() ?>"
+            alt="<?= /* @escapeNotVerified */ $block->stripTags($block->getLabel(), null, true) ?>"/></span>
+</span>

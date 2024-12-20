@@ -1,0 +1,11 @@
+<?php /** @var $block \Magento\Catalog\Block\Product\Image */
+$dataHelper = $this->helper('Magezon\LazyLoad\Helper\Data');
+$customAttributes = !is_array($block->getCustomAttributes()) ? $block->getCustomAttributes() : null;
+?>
+<img class="photo image <?= $dataHelper->getLazyClasses() ?>"
+    <?= /* @escapeNotVerified */ $customAttributes ?>
+     src="<?= $dataHelper->getPlaceHolderUrl() ?>"
+    data-src="<?= /* @escapeNotVerified */ $block->getImageUrl() ?>"
+    width="<?= /* @escapeNotVerified */ $block->getWidth() ?>"
+    height="<?= /* @escapeNotVerified */ $block->getHeight() ?>"
+    alt="<?= /* @escapeNotVerified */ $block->stripTags($block->getLabel(), null, true) ?>" />
