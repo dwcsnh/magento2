@@ -354,6 +354,7 @@ return [
         'Magento_Wishlist' => 1,
         'Magento_WishlistAnalytics' => 1,
         'Magento_WishlistGraphQl' => 1,
+        'Bss_CookieNotice' => 1,
         'Hiddentechies_Base' => 1,
         'Hiddentechies_Bizkick' => 1,
         'PayPal_Braintree' => 1,
