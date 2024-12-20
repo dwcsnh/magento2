@@ -1,0 +1,84 @@
+<style>
+    .page-main {
+        max-width: 100%;
+        padding: 0px;
+    }
+    
+    .styled-table {
+      border-collapse: collapse;
+      font-family: sans-serif;
+      min-width: 400px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+      width: 95%;
+      margin: 25px auto;
+    }
+  
+    .styled-table thead tr {
+      background-color: #009879;
+      color: #ffffff;
+      text-align: left;
+    }
+  
+  
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      font-family:Arial, Helvetica, sans-serif
+    }
+  
+    .styled-table th,
+    .styled-table td {
+      padding: 12px 15px;
+    }
+  
+    .styled-table tbody tr {
+      border-bottom: 1px solid #dddddd;
+    }
+  
+    .styled-table tbody tr:nth-of-type(even) {
+      background-color: #f3f3f3;
+    }
+  </style>
+  
+  <div id="currency_container"></div>
+  
+  <script>
+    const container = document.getElementById('currency_container')
+
+    async function init() {
+      const xml = new DOMParser().parseFromString(await fetch('https://portal.vietcombank.com.vn/Usercontrols/TVPortal.TyGia/pXML.aspx?b=68').then(res => res.text()), 'text/xml')
+      const h2 = document.createElement('h2')
+      h2.innerText = 'Joint Stock Commercial Bank for Foreign Trade of Vietnam - Vietcombank ' + xml.getElementsByTagName('DateTime')[0].textContent
+      container.appendChild(h2)
+  
+      const table = document.createElement('table')
+  
+      table.classList.add('styled-table')
+  
+      let text = `<thead>
+        <th>Mã</th>
+        <th>Tên</th>
+        <th>Mua vào</th>
+        <th>Chuyển đổi</th>
+        <th>Bán ra</th>
+      </thead>
+        <tbody>`
+      for (let item of xml.getElementsByTagName('Exrate')) {
+        text += `
+        <tr>
+          <td>${item.attributes.CurrencyCode.value}</td>
+          <td>${item.attributes.CurrencyName.value}</td>
+          <td>${item.attributes.Buy.value != '-' ? item.attributes.Buy.value + '&#8363;' : 'None'} </td>
+          <td>${item.attributes.Transfer.value != '-' ? item.attributes.Transfer.value + '&#8363;': 'None'}</td>
+          <td>${item.attributes.Sell.value != '-' ? item.attributes.Sell.value + '&#8363;': 'None'}</td>
+        </tr>
+        `
+      }
+      text += '</tbody>'
+  
+      table.innerHTML = text
+      container.appendChild(table)
+    }
+  
+    document.addEventListener('DOMContentLoaded', init)
+  </script>

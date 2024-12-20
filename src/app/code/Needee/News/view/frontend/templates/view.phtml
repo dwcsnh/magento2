@@ -1,0 +1,172 @@
+<style>
+    .page-main {
+        max-width: 100%;
+        padding: 0px;
+    }
+
+    .news-card {
+        cursor: pointer;
+        border: 1px solid #009879;
+        border-radius: 10px;
+        transition: all 0.3s ease-in-out;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        gap: 10px;
+    }
+
+    .news-card:hover {
+        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+        transform: translateY(-4px);
+    }
+
+    .news-card img {
+        width: 100%;
+        object-fit: cover;
+        transition: all 0.3s;
+    }
+
+    .news-card:hover img {
+        transform: scale(1.05);
+    }
+
+    #news_container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+        margin: 20px;
+    }
+
+    #detail_news {
+        overflow: auto;
+        border-left: 4px;
+        border-color: #e0e0e0;
+        max-width: 0px;
+        transition: max-width 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px 0px;
+    }
+
+    @keyframes loading {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+        
+    }
+
+    #loading {
+        display: none;
+        animation: loading 0.5s infinite ease-in-out;
+    }
+</style>
+
+<div style="display: flex; gap:20px; position: relative;">
+
+    <div style="flex-grow: 1; display: flex;flex-direction: column;">
+        <div id="news_container"></div>
+        <div style="width: max-content; margin: auto;">
+            <button id="btn">Tải thêm</button>
+            <img id="loading" width="50px" height="50px"
+                src="https://img.icons8.com/?size=100&id=33889&format=png&color=000000" alt="">
+        </div>
+    </div>
+
+    <div style="display: flex; height: 100vh; flex-shrink: 0; position: sticky; top: 0; gap: 20px;">
+        <div id="close_btn"
+            style="margin: auto; cursor: pointer; display: none; transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);">
+            <img width="32px" height="32px"
+                src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzFfMV8iIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDE2IDE2OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTYgMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxwYXRoIGQ9Ik04LDBDMy41ODIsMCwwLDMuNTgyLDAsOHMzLjU4Miw4LDgsOHM4LTMuNTgyLDgtOFMxMi40MTgsMCw4LDB6IE0xMC4zNTQsMTIuNjQ2bC0wLjcwNywwLjcwN0w0LjI5Myw4bDUuMzU0LTUuMzU0ICBsMC43MDcsMC43MDdMNS43MDcsOEwxMC4zNTQsMTIuNjQ2eiIvPjwvc3ZnPg=="
+                alt="">
+        </div>
+        <div id="detail_news">
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const newsContainer = document.getElementById('news_container')
+    const btn = document.getElementById('btn')
+    const detail_news = document.getElementById('detail_news')
+    const close_btn = document.getElementById('close_btn')
+    const loading = document.getElementById('loading')
+    let page = 0
+
+    function openDetail() {
+        detail_news.style.maxWidth = '40vw'
+        close_btn.style.display = 'block'
+        close_btn.onclick = closeDetail
+        close_btn.style.rotate = '180deg'
+    }
+
+    function closeDetail() {
+        detail_news.style.maxWidth = '0px'
+        close_btn.style.display = 'hidden'
+        close_btn.style.rotate = '0deg'
+        close_btn.onclick = openDetail
+    }
+
+    function renderDetail(news) {
+        detail_news.innerHTML =
+            `
+        <div>
+            <h2>${news.attributes.title}</h2>
+            <div style="font-size:small">Ngày đăng ${new Date(news.attributes.publishOn).toLocaleString('vi-VI')}</div>
+            </div>
+            <img style="width:100%; object-fit:cover; object-position:center" src="${news.links.uriImage}" alt="">
+            <div>${news.attributes.content}</div>
+            <a href="${news.links.canonical}">Đọc bài viết gốc</a>
+            `
+    }
+
+    async function loadNews() {
+        btn.style.display = 'none'
+        loading.style.display = 'block'
+        fetch(`https://seeking-alpha.p.rapidapi.com/news/v2/list?size=20&category=market-news%3A%3Aall&number=${page}`, {
+            headers: {
+                'x-rapidapi-key': '5ae7ef4d80msh360c2d2fc860412p1699e1jsnf5929929bced',
+                'x-rapidapi-host': 'seeking-alpha.p.rapidapi.com'
+            }
+        })
+        .then(res => res.json())
+            .then(res => {
+                page++
+                btn.style.display = 'block'
+                loading.style.display = 'none'
+                res.data.forEach(news => {
+
+                    const newsCard = document.createElement('div')
+                    newsCard.classList.add('news-card')
+
+                    newsCard.innerHTML =
+                        `
+                        <div style="max-height:200px; overflow:hidden"><img src="${news.links.uriImage}" alt="${news.attributes.title}"></div>
+                        <b style="padding: 0px 20px">${news.attributes.title}</b>
+                        <p style="padding: 0px 20px; font-size:small">Ngày đăng ${new Date(news.attributes.publishOn).toLocaleString('vi-VI')}</p>
+                    `
+
+                    newsCard.addEventListener('click', () => {
+                        renderDetail(news)
+                        openDetail()
+                    })
+
+                    newsContainer.appendChild(newsCard)
+
+                })
+            })
+    }
+
+    async function init() {
+        loadNews()
+        btn.addEventListener('click', loadNews)
+    }
+
+    document.addEventListener('DOMContentLoaded', init)
+</script>
