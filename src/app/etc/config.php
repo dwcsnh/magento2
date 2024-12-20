@@ -356,12 +356,16 @@ return [
         'Magento_WishlistGraphQl' => 1,
         'Bss_CookieNotice' => 1,
         'Bss_OrderDetails' => 1,
+        'Boolfly_ZaloPay' => 1,
         'Hiddentechies_Base' => 1,
         'Hiddentechies_Bizkick' => 1,
+        'PHPCuong_Core' => 1,
+        'PHPCuong_OnePay' => 1,
         'PayPal_Braintree' => 1,
         'PayPal_BraintreeCustomerBalance' => 1,
         'PayPal_BraintreeGiftCardAccount' => 1,
         'PayPal_BraintreeGiftWrapping' => 1,
-        'PayPal_BraintreeGraphQl' => 1
+        'PayPal_BraintreeGraphQl' => 1,
+        'Vnpayment_VNPAY' => 1
     ]
 ];
