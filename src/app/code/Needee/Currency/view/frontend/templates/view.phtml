@@ -1,84 +1,222 @@
 <style>
-    .page-main {
-        max-width: 100%;
-        padding: 0px;
-    }
-    
-    .styled-table {
-      border-collapse: collapse;
-      font-family: sans-serif;
-      min-width: 400px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
-      width: 95%;
-      margin: 25px auto;
-    }
-  
-    .styled-table thead tr {
-      background-color: #009879;
-      color: #ffffff;
-      text-align: left;
-    }
-  
-  
-    h2 {
-      text-align: center;
-      color: #2c3e50;
-      font-family:Arial, Helvetica, sans-serif
-    }
-  
-    .styled-table th,
-    .styled-table td {
-      padding: 12px 15px;
-    }
-  
-    .styled-table tbody tr {
-      border-bottom: 1px solid #dddddd;
-    }
-  
-    .styled-table tbody tr:nth-of-type(even) {
-      background-color: #f3f3f3;
+    #currency_wrapper {
+      width: min(95vw, 1200px);
+      padding: 0px;
+      margin: auto;
+
+      table {
+        border-collapse: separate;
+        border-radius: 12px 12px 0 0;
+        overflow: hidden;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgb(168, 168, 168);
+
+        thead {
+          background-color:rgb(26, 26, 26);
+
+          tr {
+            th {
+              font-size: 18px;
+              color: white;
+              font-weight: 700;
+              text-align: center;
+              transition: ease 0.3s;
+
+              img {
+                width: 25px;
+                position: relative;
+                top: 5px;
+              }
+            }
+
+            th:hover {
+              cursor: pointer;
+              background-color:rgb(151, 206, 159);
+              color: #3f3f3f;
+            }
+          }
+        }
+
+        tbody {
+          tr {
+            background-color:rgb(229, 255, 251);
+            transition: ease 0.3s;
+
+            td {
+              text-align: right;
+              padding-right: 1.5%;
+              border-right: 1px solid rgb(168, 168, 168);
+              border-bottom: 1px solid rgb(168, 168, 168);
+            }
+
+            .td-center {
+              text-align: center;
+            }
+
+            td:last-child {
+              border-right: none;
+            }
+          }
+
+          tr:last-child td {
+            border-bottom: none;
+          }
+
+          tr:nth-of-type(even) {
+            background-color: rgb(255, 255, 255);
+          }
+
+          tr:hover {
+            background-color:rgb(151, 206, 159);
+          }
+          
+        }
+      }
     }
   </style>
   
-  <div id="currency_container"></div>
-  
-  <script>
-    const container = document.getElementById('currency_container')
+<div id="currency_wrapper"></div>
 
-    async function init() {
-      const xml = new DOMParser().parseFromString(await fetch('https://portal.vietcombank.com.vn/Usercontrols/TVPortal.TyGia/pXML.aspx?b=68').then(res => res.text()), 'text/xml')
-      const h2 = document.createElement('h2')
-      h2.innerText = 'Joint Stock Commercial Bank for Foreign Trade of Vietnam - Vietcombank ' + xml.getElementsByTagName('DateTime')[0].textContent
-      container.appendChild(h2)
-  
-      const table = document.createElement('table')
-  
-      table.classList.add('styled-table')
-  
-      let text = `<thead>
-        <th>Mã</th>
-        <th>Tên</th>
-        <th>Mua vào</th>
-        <th>Chuyển đổi</th>
-        <th>Bán ra</th>
-      </thead>
-        <tbody>`
-      for (let item of xml.getElementsByTagName('Exrate')) {
-        text += `
-        <tr>
-          <td>${item.attributes.CurrencyCode.value}</td>
-          <td>${item.attributes.CurrencyName.value}</td>
-          <td>${item.attributes.Buy.value != '-' ? item.attributes.Buy.value + '&#8363;' : 'None'} </td>
-          <td>${item.attributes.Transfer.value != '-' ? item.attributes.Transfer.value + '&#8363;': 'None'}</td>
-          <td>${item.attributes.Sell.value != '-' ? item.attributes.Sell.value + '&#8363;': 'None'}</td>
-        </tr>
-        `
-      }
-      text += '</tbody>'
-  
-      table.innerHTML = text
-      container.appendChild(table)
+<script>
+  const container = document.getElementById('currency_wrapper');
+
+  function formatNumber(number) {
+    return number.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+
+  const icons = {
+      none: "<?php echo $this->getViewFileUrl('Needee_Currency::images/two-way-arrow.svg'); ?>",
+      asc: "<?php echo $this->getViewFileUrl('Needee_Currency::images/down-arrow.svg'); ?>",
+      desc: "<?php echo $this->getViewFileUrl('Needee_Currency::images/up-arrow.svg'); ?>",
+    };
+
+  async function init() {
+    const xml = new DOMParser().parseFromString(
+      await fetch(
+        'https://portal.vietcombank.com.vn/Usercontrols/TVPortal.TyGia/pXML.aspx?b=68'
+      ).then((res) => res.text()),
+      'text/xml'
+    );
+    const h2 = document.createElement('h2');
+    h2.innerText =
+      xml.getElementsByTagName('Source')[0].textContent +
+      ' ' +
+      xml.getElementsByTagName('DateTime')[0].textContent;
+    container.appendChild(h2);
+
+    const table = document.createElement('table');
+    table.classList.add('currency_table');
+
+    let text = `<thead>
+      <tr>
+        <th data-column="CurrencyCode">Code <span><img class="sortable-icon" src=${icons.none} alt="Sort Icon"></span></th>
+        <th data-column="CurrencyName">Name <span><img class="sortable-icon" src=${icons.none} alt="Sort Icon"></span></th>
+        <th data-column="Buy">Buy <span><img class="sortable-icon" src=${icons.none} alt="Sort Icon"></span></th>
+        <th data-column="Transfer">Transfer <span><img class="sortable-icon" src=${icons.none} alt="Sort Icon"></span></th>
+        <th data-column="Sell">Sell <span><img class="sortable-icon" src=${icons.none} alt="Sort Icon"></span></th>
+      </tr>
+    </thead>
+      <tbody>`;
+
+    const rows = [];
+    for (let item of xml.getElementsByTagName('Exrate')) {
+      rows.push({
+        CurrencyCode: item.attributes.CurrencyCode.value,
+        CurrencyName: item.attributes.CurrencyName.value,
+        Buy: item.attributes.Buy.value !== '-' ? parseFloat(item.attributes.Buy.value.replace(/,/g, "")) : null,
+        Transfer:
+          item.attributes.Transfer.value !== '-'
+            ? parseFloat(item.attributes.Transfer.value.replace(/,/g, ""))
+            : null,
+        Sell:
+          item.attributes.Sell.value !== '-'
+            ? parseFloat(item.attributes.Sell.value.replace(/,/g, ""))
+            : null,
+      });
     }
-  
-    document.addEventListener('DOMContentLoaded', init)
-  </script>
+
+    rows.forEach((item) => {
+      text += `
+      <tr>
+        <td class="td-center">${item.CurrencyCode}</td>
+        <td class="td-center">${item.CurrencyName}</td>
+        <td>${item.Buy !== null ? formatNumber(item.Buy) + '&#8363;' : 'None'}</td>
+        <td>${item.Transfer !== null ? formatNumber(item.Transfer) + '&#8363;' : 'None'}</td>
+        <td>${item.Sell !== null ? formatNumber(item.Sell) + '&#8363;' : 'None'}</td>
+      </tr>`;
+    });
+
+    text += '</tbody>';
+    table.innerHTML = text;
+    container.appendChild(table);
+
+    addSortingFunctionality(table);
+  }
+
+  function addSortingFunctionality(table) {
+    const headers = table.querySelectorAll('thead th');
+    const tbody = table.querySelector('tbody');
+    const originalRows = Array.from(tbody.querySelectorAll('tr'));
+    let currentSort = { column: null, direction: 'none' };
+
+    headers.forEach((header, index) => {
+      header.addEventListener('click', () => {
+        const column = header.dataset.column;
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const icon = header.querySelector('.sortable-icon');
+
+        if (currentSort.column === column) {
+          currentSort.direction =
+            currentSort.direction === 'asc'
+              ? 'desc'
+              : currentSort.direction === 'desc'
+              ? 'none'
+              : 'asc';
+        } else {
+          currentSort.column = column;
+          currentSort.direction = 'asc';
+        }
+
+        if (currentSort.direction === 'none') {
+          currentSort.column = null;
+          tbody.innerHTML = '';
+          originalRows.forEach((row) => tbody.appendChild(row));
+        } else {
+          rows.sort((a, b) => {
+            const aValue = a.children[index].textContent.trim();
+            const bValue = b.children[index].textContent.trim();
+
+            if (aValue === 'None') return 1;
+            if (bValue === 'None') return -1;
+
+            if (column === 'Buy' || column === 'Transfer' || column === 'Sell') {
+              const aNumber = parseFloat(
+                aValue.replace(/,/g, '').replace('&#8363;', '').trim()
+              );
+              const bNumber = parseFloat(
+                bValue.replace(/,/g, '').replace('&#8363;', '').trim()
+              );
+              return currentSort.direction === 'asc' ? aNumber - bNumber : bNumber - aNumber;
+            }
+
+            return currentSort.direction === 'asc'
+              ? aValue.localeCompare(bValue)
+              : bValue.localeCompare(aValue);
+          });
+
+          tbody.innerHTML = '';
+          rows.forEach((row) => tbody.appendChild(row));
+        }
+
+        headers.forEach((header) => {
+          const icon = header.querySelector('.sortable-icon');
+          if (icon) icon.src = icons.none;
+        });
+
+        if (icon) icon.src = icons[currentSort.direction];
+      });
+    });
+  }
+
+document.addEventListener('DOMContentLoaded', init);
+</script>

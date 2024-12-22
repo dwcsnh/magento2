@@ -30,6 +30,21 @@ $showHome = $helper->getConfigValue('bizkicksettings/navigation_settings/enable'
                 </a>
             </li>
         <?php } ?>
+        <li class="level0 level-top">
+            <a class="level-top" href="<?php echo $baseUrl . 'news'; ?>">
+                <?php echo __('News'); ?>
+            </a>
+        </li>
+        <li class="level0 level-top">
+            <a class="level-top" href="<?php echo $baseUrl . 'weather'; ?>">
+                <?php echo __('Weather'); ?>
+            </a>
+        </li>
+        <li class="level0 level-top">
+            <a class="level-top" href="<?php echo $baseUrl . 'currency'; ?>">
+                <?php echo __('Currency'); ?>
+            </a>
+        </li>
         <?php /* @escapeNotVerified */ echo $_menu; ?>
     </ul>
 </nav>

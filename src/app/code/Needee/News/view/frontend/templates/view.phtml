@@ -1,53 +1,170 @@
 <style>
-    .page-main {
-        max-width: 100%;
-        padding: 0px;
-    }
+    .newsPage_wrapper {
+        width: min(95vw, 1200px);
+        margin: auto;
 
-    .news-card {
-        cursor: pointer;
-        border: 1px solid #009879;
-        border-radius: 10px;
-        transition: all 0.3s ease-in-out;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        overflow: hidden;
-        gap: 10px;
-    }
+        h1 {
+            font-weight: 700;
+            color: #195A94;
+        }
 
-    .news-card:hover {
-        box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-        transform: translateY(-4px);
-    }
+        #newsCards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 20px;
+            grid-auto-rows: 450px;
 
-    .news-card img {
-        width: 100%;
-        object-fit: cover;
-        transition: all 0.3s;
-    }
+            .newsCard {
+                display: flex;
+                flex-direction: column;
+                transition: all 0.5s ease;
+                position: relative;
+                overflow: hidden;
 
-    .news-card:hover img {
-        transform: scale(1.05);
-    }
+                .image {
+                    width: 100%;
+                    position: relative;
+                    padding-top: 65%;
+                    overflow: hidden;
+                    border-radius: 8px;
+                    cursor: pointer;
 
-    #news_container {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 20px;
-        margin: 20px;
-    }
+                    img {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        transition: transform 0.3s ease;
 
-    #detail_news {
-        overflow: auto;
-        border-left: 4px;
-        border-color: #e0e0e0;
-        max-width: 0px;
-        transition: max-width 0.3s cubic-bezier(0.075, 0.82, 0.165, 1);
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px 0px;
+                    }
+
+                    img:hover {
+                        transform: scale(1.1);
+                    }
+                }
+
+                .publishAndDuration {
+                    display: flex;
+                    justify-content: space-evenly;
+                    align-items: center;
+                    margin-top: 8px;
+
+                    .publish, .duration {
+                        display: flex;
+
+                        .logo-s {
+                            display: flex;
+                            align-items: center;
+                            img {
+                                width: 24px;
+                            }
+                        }
+
+                        .small-text {
+                            display: flex;
+                            align-items: center;
+                            margin-left: 5px;
+                            font-weight: 600;
+                            color: #747474;
+                        }
+                    }
+                }
+
+                .detail {
+                    .detail_title {
+                        color: #195A94;
+                        margin: 10px 0px;
+                        font-size: 20px;
+                        font-weight: 700;
+                    }
+
+                    .detail_content {
+                        display: none;
+                    }
+                }
+
+                .read_wrapper {
+                    display: flex;
+                    justify-content: space-evenly;
+                    align-items: end;
+                    flex: 1;
+
+                    div {
+                        padding: 10px 15px;
+                        background-color: #195A94;
+                        color: #fff;
+                        font-weight: 600;
+                        border-radius: 8px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        font-size: 15px;
+                        display: flex;
+                        align-items: center;
+                        transition: ease 0.4s;
+
+                        img {
+                            width: 24px;
+                            margin-left: 5px;
+                        }
+                    }
+
+                    div:hover {
+                        background-color:rgb(112, 231, 231);
+                        color: #000;
+                    }
+
+                    #canonical-link {
+                        background-color: #83E383;
+                        color: #000;
+                    }
+                    #canonical-link:hover {
+                        background-color:rgb(90, 88, 228);
+                        color: #fff;
+                    }
+                }
+            }
+
+            .expanded {
+                grid-column: span 2;
+                grid-row: span 3;
+
+            }
+
+            .expanded .detail {
+                .detail_content {
+                    display: block;
+                    margin-top: 10px;
+                    max-height: 700px;
+                    overflow-y: scroll;
+                }
+            }
+        }
+
+        .moreNews {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+
+            #btn {
+                background-color: #6fd7a3;
+                margin-top: 30px;
+                border-radius: 8px;
+                transition: ease 0.3s;
+            }
+
+            #btn:hover {
+                background-color:rgb(34, 109, 175);
+                color: #fff;
+            }
+
+            #loading {
+                display: none;
+                animation: loading 0.8s infinite ease-in-out;
+                width: 70px;
+            }
+        }
     }
 
     @keyframes loading {
@@ -58,115 +175,197 @@
         100% {
             transform: rotate(360deg);
         }
-        
     }
 
-    #loading {
-        display: none;
-        animation: loading 0.5s infinite ease-in-out;
-    }
+    
 </style>
 
-<div style="display: flex; gap:20px; position: relative;">
+<div class="newsPage_wrapper">
+    <h1 id="newsTitle"></h1>
 
-    <div style="flex-grow: 1; display: flex;flex-direction: column;">
-        <div id="news_container"></div>
-        <div style="width: max-content; margin: auto;">
-            <button id="btn">Tải thêm</button>
-            <img id="loading" width="50px" height="50px"
-                src="https://img.icons8.com/?size=100&id=33889&format=png&color=000000" alt="">
-        </div>
+    <!-- Grid -->
+    <div id="newsCards">
     </div>
 
-    <div style="display: flex; height: 100vh; flex-shrink: 0; position: sticky; top: 0; gap: 20px;">
-        <div id="close_btn"
-            style="margin: auto; cursor: pointer; display: none; transition: transform 0.5s cubic-bezier(0.075, 0.82, 0.165, 1);">
-            <img width="32px" height="32px"
-                src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzFfMV8iIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDE2IDE2OyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgMTYgMTYiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxwYXRoIGQ9Ik04LDBDMy41ODIsMCwwLDMuNTgyLDAsOHMzLjU4Miw4LDgsOHM4LTMuNTgyLDgtOFMxMi40MTgsMCw4LDB6IE0xMC4zNTQsMTIuNjQ2bC0wLjcwNywwLjcwN0w0LjI5Myw4bDUuMzU0LTUuMzU0ICBsMC43MDcsMC43MDdMNS43MDcsOEwxMC4zNTQsMTIuNjQ2eiIvPjwvc3ZnPg=="
-                alt="">
-        </div>
-        <div id="detail_news">
-        </div>
+    <div class="moreNews"">
+        <button id="btn">More News</button>
+        
+        <img src="" alt="Loading" id="loading">
     </div>
-
 </div>
 
 <script>
-    const newsContainer = document.getElementById('news_container')
-    const btn = document.getElementById('btn')
-    const detail_news = document.getElementById('detail_news')
-    const close_btn = document.getElementById('close_btn')
-    const loading = document.getElementById('loading')
     let page = 0
+    const icons = {
+        calendar: "<?php echo $this->getViewFileUrl('Needee_News::images/calendar.png'); ?>",
+        duration: "<?php echo $this->getViewFileUrl('Needee_News::images/duration.png'); ?>",
+        redirect: "<?php echo $this->getViewFileUrl('Needee_News::images/redirect.png'); ?>",
+        downArrow: "<?php echo $this->getViewFileUrl('Needee_News::images/down-arrow.svg'); ?>",
+        upArrow: "<?php echo $this->getViewFileUrl('Needee_News::images/up-arrow.svg'); ?>",
+        loading: "<?php echo $this->getViewFileUrl('Needee_News::images/loading.png'); ?>",
+    }
+    const loadingImg = document.getElementById("loading");
+    loadingImg.src = icons.loading;
+    const newsCards = document.getElementById("newsCards");
 
-    function openDetail() {
-        detail_news.style.maxWidth = '40vw'
-        close_btn.style.display = 'block'
-        close_btn.onclick = closeDetail
-        close_btn.style.rotate = '180deg'
+    function getCurrentTime() {
+        const now = new Date();
+        const options = { 
+            weekday: 'short', 
+            year: 'numeric', 
+            month: 'short', 
+            day: '2-digit', 
+            hour: '2-digit', 
+            minute: '2-digit', 
+            second: '2-digit' 
+        };
+        return now.toLocaleDateString('en-US', options);
     }
 
-    function closeDetail() {
-        detail_news.style.maxWidth = '0px'
-        close_btn.style.display = 'hidden'
-        close_btn.style.rotate = '0deg'
-        close_btn.onclick = openDetail
+    const newsTitle = document.getElementById("newsTitle");
+    newsTitle.textContent = `News Updated: ${getCurrentTime()}`;
+
+    function formatDate(ISODate) {
+        const dateObj = new Date(ISODate);
+
+        if (isNaN(dateObj.getTime())) {
+            return "Invalid date";
+        }
+        
+        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return dateObj.toLocaleDateString('en-US', options);
     }
 
-    function renderDetail(news) {
-        detail_news.innerHTML =
-            `
-        <div>
-            <h2>${news.attributes.title}</h2>
-            <div style="font-size:small">Ngày đăng ${new Date(news.attributes.publishOn).toLocaleString('vi-VI')}</div>
-            </div>
-            <img style="width:100%; object-fit:cover; object-position:center" src="${news.links.uriImage}" alt="">
-            <div>${news.attributes.content}</div>
-            <a href="${news.links.canonical}">Đọc bài viết gốc</a>
-            `
+    function getDuration(inputString) {
+        const number = parseFloat(inputString);
+
+        if (isNaN(number)) {
+            return "Invalid input";
+        }
+
+        return Math.floor(number / 60 + 3);
     }
 
     async function loadNews() {
         btn.style.display = 'none'
         loading.style.display = 'block'
-        fetch(`https://seeking-alpha.p.rapidapi.com/news/v2/list?size=20&category=market-news%3A%3Aall&number=${page}`, {
+        fetch(`https://seeking-alpha.p.rapidapi.com/news/v2/list?size=18&category=market-news%3A%3Aall&number=${page}`, {
             headers: {
-                'x-rapidapi-key': '5ae7ef4d80msh360c2d2fc860412p1699e1jsnf5929929bced',
+                'x-rapidapi-key': '05c1a17dd3mshb1a0f20aa61f903p18018ejsn018eb9efde64',
                 'x-rapidapi-host': 'seeking-alpha.p.rapidapi.com'
             }
         })
         .then(res => res.json())
             .then(res => {
-                page++
-                btn.style.display = 'block'
-                loading.style.display = 'none'
+                btn.style.display = 'block';
+                loading.style.display = 'none';
+                page++;
                 res.data.forEach(news => {
 
-                    const newsCard = document.createElement('div')
-                    newsCard.classList.add('news-card')
+                    const newsCard = document.createElement('div');
+                    newsCard.classList.add('newsCard');
 
                     newsCard.innerHTML =
-                        `
-                        <div style="max-height:200px; overflow:hidden"><img src="${news.links.uriImage}" alt="${news.attributes.title}"></div>
-                        <b style="padding: 0px 20px">${news.attributes.title}</b>
-                        <p style="padding: 0px 20px; font-size:small">Ngày đăng ${new Date(news.attributes.publishOn).toLocaleString('vi-VI')}</p>
+                    `   <div class="image">
+                            <img src="${news.links.uriImage}" alt="${news.attributes.title}" title="${news.attributes.title}">
+                        </div>
+                        <div class="publishAndDuration">
+                            <div class="publish">
+                                <div class="logo-s">
+                                    <img src="${icons.calendar}" alt="Calendar Logo">
+                                </div>
+                                <div class="small-text">
+                                    ${formatDate(news.attributes.publishOn)}
+                                </div>
+                            </div>
+
+                            <div class="duration">
+                                <div class="logo-s">
+                                    <img src="${icons.duration}" alt="Duration Logo">
+                                </div>
+                                <div class="small-text">
+                                    ${getDuration(news.attributes.audioDuration)} mins read
+                                </div>
+                            </div>
+                        </div>
+                        <div class="detail">
+                            <div class="detail_title">${news.attributes.title}</div>
+                            
+                            <div class="detail_content">
+                                ${news.attributes.content}
+                            </div>
+                        </div>
+
+                        <div class="read_wrapper">
+                            <a href = "${news.links.canonical}" target="_blank">
+                                <div id="canonical-link">
+                                    Read Article
+                                    <img src="${icons.redirect}" alt="Redirect Logo">
+                                </div>
+                            </a>
+                            <div id="read-more">
+                                Read More
+                                <img src="${icons.downArrow}" alt="Read More/Less Logo">
+                            </div>
+                        </div>
                     `
-
-                    newsCard.addEventListener('click', () => {
-                        renderDetail(news)
-                        openDetail()
-                    })
-
-                    newsContainer.appendChild(newsCard)
-
+                    
+                    newsCards.appendChild(newsCard);
                 })
             })
     }
 
     async function init() {
-        loadNews()
-        btn.addEventListener('click', loadNews)
+        let expandedCard = null;
+
+        loadNews();
+        btn.addEventListener('click', loadNews);
+
+        newsCards.addEventListener('click', (e) => {
+            const target = e.target;
+
+            if (target.closest('.image')) {
+                const parentCard = target.closest('.newsCard');
+                const link = parentCard.querySelector('.read_wrapper a');
+                if (link) {
+                    window.open(link.href, '_blank');
+                }
+            }
+
+            if (target.closest('#read-more')) {
+                const parentCard = target.closest('.newsCard');
+
+                if (expandedCard && expandedCard !== parentCard) {
+                    expandedCard.classList.remove('expanded');
+                    const previousArrow = expandedCard.querySelector('#read-more img');
+                    if (previousArrow) {
+                        previousArrow.src = icons.downArrow;
+                    }
+                    const previousText = expandedCard.querySelector('#read-more');
+                    if (previousText) {
+                        previousText.firstChild.nodeValue = 'Read More';
+                    }
+                }
+
+                if (parentCard.classList.contains('expanded')) {
+                    parentCard.classList.remove('expanded');
+                    target.querySelector('img').src = icons.downArrow;
+                    target.firstChild.nodeValue = 'Read More';
+                    expandedCard = null;
+                } else {
+                    parentCard.classList.add('expanded');
+                    target.querySelector('img').src = icons.upArrow;
+                    target.firstChild.nodeValue = 'Read Less';
+                    expandedCard = parentCard;
+                }
+
+                parentCard.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                });
+            }
+        });
     }
 
-    document.addEventListener('DOMContentLoaded', init)
+    document.addEventListener('DOMContentLoaded', init);
 </script>
